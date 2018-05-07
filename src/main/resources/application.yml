@@ -1,0 +1,33 @@
+zuul:
+  routes:
+    iam:
+      path: /iam/**
+      url: http://localhost:8080/iam
+      sensitiveHeaders:
+    formsapi:
+      path: /forms/api/**
+      url: http://localhost:8081/forms/api
+      sensitiveHeaders:
+    frontend:
+      path: /**
+      url: http://localhost:4200/
+      sensitiveHeaders:
+
+server:
+  port: 8082
+
+ribbon:
+  eureka:
+    enabled: false
+
+
+# TODO: These properties should not be here. Fix!
+spring:
+  datasource:
+    platform: postgresql
+    url: jdbc:postgresql://localhost:5432/faceter
+    username: faceter
+    password: Smeerkaas1!
+
+security:
+  signing-key: MaYzkSjmkzPC57L
