@@ -95,7 +95,7 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
     }
 
     private Cookie createClientReadableLoggedInCookie() {
-        Cookie accessTokenCookie = new Cookie(AUTHENTICATED_COOKIE_NAME, null);
+        Cookie accessTokenCookie = new Cookie(AUTHENTICATED_COOKIE_NAME, "1");
         accessTokenCookie.setPath("/");
         accessTokenCookie.setHttpOnly(false); // This cookie must be readable by the frontend
         return accessTokenCookie;
