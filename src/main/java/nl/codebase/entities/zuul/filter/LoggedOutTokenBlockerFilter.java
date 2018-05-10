@@ -2,7 +2,7 @@ package nl.codebase.entities.zuul.filter;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.exception.ZuulException;
-import nl.codebase.faceter.common.token.TokenService;
+import nl.codebase.entities.common.token.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
 import org.springframework.http.HttpStatus;

@@ -18,8 +18,10 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Base64;
 
-import static nl.codebase.faceter.common.FaceterConstants.PARAM_ACCESS_TOKEN;
-import static nl.codebase.faceter.common.FaceterConstants.PARAM_REFRESH_TOKEN;
+import static nl.codebase.entities.common.FaceterConstants.AUTHENTICATED_COOKIE_NAME;
+import static nl.codebase.entities.common.FaceterConstants.PARAM_ACCESS_TOKEN;
+import static nl.codebase.entities.common.FaceterConstants.PARAM_REFRESH_TOKEN;
+
 
 
 /**
@@ -32,7 +34,7 @@ import static nl.codebase.faceter.common.FaceterConstants.PARAM_REFRESH_TOKEN;
  */
 @Slf4j
 @Component
-public class TokensToCookiePostFilter extends ZuulFilter {
+public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -63,8 +65,9 @@ public class TokensToCookiePostFilter extends ZuulFilter {
             String body = StreamUtils.copyToString(stream, Charset.forName("UTF-8"));
             AccessToken accessToken = mapper.readValue(body, AccessToken.class);
             if (accessToken.isPresent()) {
-                context.getResponse().addCookie(createCookieFromAccessTokenInResponse(accessToken));
-                context.getResponse().addCookie(createCookieFromRefreshTokenInResponse(accessToken));
+                context.getResponse().addCookie(createAccessTokenCookie(accessToken));
+                context.getResponse().addCookie(createRefreshTokenCookie(accessToken));
+                context.getResponse().addCookie(createClientReadableLoggedInCookie());
                 accessToken.clearSensitiveFields();
                 context.setResponseBody(null);
             }
@@ -75,7 +78,7 @@ public class TokensToCookiePostFilter extends ZuulFilter {
         return null;
     }
 
-    private Cookie createCookieFromRefreshTokenInResponse(AccessToken accessToken) throws IOException {
+    private Cookie createRefreshTokenCookie(AccessToken accessToken) throws IOException {
         Cookie refreshTokenCookie = new Cookie(PARAM_REFRESH_TOKEN, accessToken.getRefreshToken());
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setHttpOnly(true);
@@ -83,11 +86,18 @@ public class TokensToCookiePostFilter extends ZuulFilter {
         return refreshTokenCookie;
     }
 
-    private Cookie createCookieFromAccessTokenInResponse(AccessToken accessToken) throws IOException {
+    private Cookie createAccessTokenCookie(AccessToken accessToken) throws IOException {
         Cookie accessTokenCookie = new Cookie(PARAM_ACCESS_TOKEN, accessToken.getAccessToken());
         accessTokenCookie.setPath("/");
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setMaxAge(getExpirationSecondsFromToken(accessToken.getAccessToken()));
+        return accessTokenCookie;
+    }
+
+    private Cookie createClientReadableLoggedInCookie() {
+        Cookie accessTokenCookie = new Cookie(AUTHENTICATED_COOKIE_NAME, null);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setHttpOnly(false); // This cookie must be readable by the frontend
         return accessTokenCookie;
     }
 

@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static nl.codebase.faceter.common.FaceterConstants.PARAM_REFRESH_TOKEN;
+import static nl.codebase.entities.common.FaceterConstants.PARAM_REFRESH_TOKEN;
 import static nl.codebase.entities.zuul.ProxyConstants.PARAM_GRANT_TYPE;
 import static nl.codebase.entities.zuul.ProxyConstants.STATUS_UNAUTHORIZED;
 

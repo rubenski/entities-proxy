@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static nl.codebase.faceter.common.FaceterConstants.PARAM_ACCESS_TOKEN;
-import static nl.codebase.faceter.common.FaceterConstants.PARAM_REFRESH_TOKEN;
+import static nl.codebase.entities.common.FaceterConstants.PARAM_ACCESS_TOKEN;
+import static nl.codebase.entities.common.FaceterConstants.PARAM_REFRESH_TOKEN;
 
 public class RequestUtil {
 
