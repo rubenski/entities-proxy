@@ -17,6 +17,9 @@
         </encoder>
     </appender>
 
+    <logger name="org.apache.http.wire" level="ERROR"/>
+
+
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
