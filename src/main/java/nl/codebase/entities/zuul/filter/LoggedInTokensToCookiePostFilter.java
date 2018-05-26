@@ -48,12 +48,13 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
         return 10;
     }
 
+    // Run only for successful token requests
     @Override
     public boolean shouldFilter() {
         RequestContext context = RequestContext.getCurrentContext();
         HttpServletRequest request = context.getRequest();
         String requestURI = request.getRequestURI();
-        return requestURI.contains("oauth");
+        return requestURI.contains("oauth") && context.getResponse().getStatus() == 200;
     }
 
     @Override
