@@ -9,8 +9,8 @@ zuul:
       url: http://localhost:8081/forms/api
       sensitiveHeaders:
     userapi:
-          path: /api/user/**
-          url: http://localhost:8083/api/user
+          path: /api/account/**
+          url: http://localhost:8083/api/account
           sensitiveHeaders:
     frontend:
       path: /**
