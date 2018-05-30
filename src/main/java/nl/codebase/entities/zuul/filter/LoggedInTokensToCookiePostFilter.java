@@ -66,12 +66,12 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
 
         try {
             String body = StreamUtils.copyToString(stream, Charset.forName("UTF-8"));
-            IAMTokenResponse IAMTokenResponse = mapper.readValue(body, IAMTokenResponse.class);
-            if (IAMTokenResponse.isPresent() && IAMTokenResponse.hasAccessToken() && IAMTokenResponse.hasRefreshToken()) {
-                context.getResponse().addCookie(createAccessTokenCookie(IAMTokenResponse));
-                context.getResponse().addCookie(createRefreshTokenCookie(IAMTokenResponse));
+            IAMTokenResponse tokenResponse = mapper.readValue(body, IAMTokenResponse.class);
+            if (tokenResponse.isPresent() && tokenResponse.hasAccessToken() && tokenResponse.hasRefreshToken()) {
+                context.getResponse().addCookie(createAccessTokenCookie(tokenResponse));
+                context.getResponse().addCookie(createRefreshTokenCookie(tokenResponse));
                 context.getResponse().addCookie(createClientReadableLoggedInCookie());
-                IAMTokenResponse.clearSensitiveFields();
+                tokenResponse.clearSensitiveFields();
                 context.setResponseBody(null);
             } else {
                 throw new IllegalArgumentException("The token response was invalid because it was missing either the access token or the refresh token or both");
