@@ -10,7 +10,6 @@ import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
-import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
@@ -53,17 +52,6 @@ public class RefreshTokenToBodyPreFilter extends ZuulFilter {
         return requestURI.contains("token");
     }
 
-    private Optional<StandardMultipartHttpServletRequest> getRequest() {
-        RequestContext context = RequestContext.getCurrentContext();
-        InputStream stream = (InputStream) context.get("requestEntity");
-        if (stream == null) {
-            HttpServletRequestWrapper request = (HttpServletRequestWrapper) context.getRequest();
-            if (request.getRequest() instanceof StandardMultipartHttpServletRequest) {
-                return Optional.of((StandardMultipartHttpServletRequest) request.getRequest());
-            }
-        }
-        return Optional.empty();
-    }
 
     @Override
     public Object run() {
@@ -74,12 +62,12 @@ public class RefreshTokenToBodyPreFilter extends ZuulFilter {
         String grantType = request.getParameter(PARAM_GRANT_TYPE);
 
         // If this is a token refresh attempt we need to check for a cookie containing the refresh token
-        if(PARAM_REFRESH_TOKEN.equals(grantType)) {
+        if (PARAM_REFRESH_TOKEN.equals(grantType)) {
             // get the refresh token from cookie here and set it in the body
 
             Cookie[] cookies = context.getRequest().getCookies();
 
-            if(cookies == null) {
+            if (cookies == null) {
                 return null;
             }
 
@@ -87,7 +75,7 @@ public class RefreshTokenToBodyPreFilter extends ZuulFilter {
 
             // Actually we already know it is present when ending up here, because the InvalidRequestFilter
             // will stop the request short when no refresh_token is present for a refresh_token request.
-            if(!refreshTokenCookieOptional.isPresent()) {
+            if (!refreshTokenCookieOptional.isPresent()) {
                 throw new ZuulRuntimeException(new ZuulException("No refresh token found", HttpStatus.UNAUTHORIZED.value(), STATUS_UNAUTHORIZED));
             }
 
@@ -124,7 +112,7 @@ public class RefreshTokenToBodyPreFilter extends ZuulFilter {
                     @Override
                     public String getParameter(String name) {
 
-                        if(name.equals("refresh_token")) {
+                        if (name.equals("refresh_token")) {
                             return "hallelujah";
                         }
 
