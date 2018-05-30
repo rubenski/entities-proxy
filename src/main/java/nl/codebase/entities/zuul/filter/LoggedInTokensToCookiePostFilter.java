@@ -91,11 +91,11 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
         return refreshTokenCookie;
     }
 
-    private Cookie createAccessTokenCookie(IAMTokenResponse IAMTokenResponse) throws IOException {
-        Cookie accessTokenCookie = new Cookie(PARAM_ACCESS_TOKEN, IAMTokenResponse.getAccessToken());
+    private Cookie createAccessTokenCookie(IAMTokenResponse tokenResponse) throws IOException {
+        Cookie accessTokenCookie = new Cookie(PARAM_ACCESS_TOKEN, tokenResponse.getAccessToken());
         accessTokenCookie.setPath("/");
         accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setMaxAge(getExpirationSecondsFromToken(IAMTokenResponse.getAccessToken()));
+        accessTokenCookie.setMaxAge(getExpirationSecondsFromToken(tokenResponse.getAccessToken()));
         return accessTokenCookie;
     }
 
