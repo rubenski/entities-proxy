@@ -8,6 +8,8 @@ import com.netflix.zuul.context.RequestContext;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import nl.codebase.entities.common.account.Account;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 
@@ -65,12 +67,14 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
         try {
             String body = StreamUtils.copyToString(stream, Charset.forName("UTF-8"));
             AccessToken accessToken = mapper.readValue(body, AccessToken.class);
-            if (accessToken.isPresent()) {
+            if (accessToken.isPresent() && accessToken.hasAccessToken() && accessToken.hasRefreshToken()) {
                 context.getResponse().addCookie(createAccessTokenCookie(accessToken));
                 context.getResponse().addCookie(createRefreshTokenCookie(accessToken));
                 context.getResponse().addCookie(createClientReadableLoggedInCookie());
                 accessToken.clearSensitiveFields();
                 context.setResponseBody(null);
+            } else {
+                throw new IllegalArgumentException("The access token provided by IAM was invalid");
             }
         } catch (IOException e) {
             log.error("Cannot deserialize token response", e);
@@ -118,6 +122,7 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
 
     @Getter
     @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class AccessToken {
 
         @JsonProperty("access_token")
@@ -131,6 +136,8 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
 
         @JsonProperty("expires_in")
         private int expiresInSeconds;
+
+        private Account account;
 
         private String scope;
         private String jti;
@@ -149,6 +156,14 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
         void clearSensitiveFields() {
             refreshToken = null;
             accessToken = null;
+        }
+
+        public boolean hasAccessToken() {
+            return !StringUtils.isBlank(accessToken);
+        }
+
+        public boolean hasRefreshToken() {
+            return !StringUtils.isBlank(refreshToken);
         }
 
     }
