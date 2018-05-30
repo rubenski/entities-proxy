@@ -66,36 +66,36 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
 
         try {
             String body = StreamUtils.copyToString(stream, Charset.forName("UTF-8"));
-            AccessToken accessToken = mapper.readValue(body, AccessToken.class);
-            if (accessToken.isPresent() && accessToken.hasAccessToken() && accessToken.hasRefreshToken()) {
-                context.getResponse().addCookie(createAccessTokenCookie(accessToken));
-                context.getResponse().addCookie(createRefreshTokenCookie(accessToken));
+            IAMTokenResponse IAMTokenResponse = mapper.readValue(body, IAMTokenResponse.class);
+            if (IAMTokenResponse.isPresent() && IAMTokenResponse.hasAccessToken() && IAMTokenResponse.hasRefreshToken()) {
+                context.getResponse().addCookie(createAccessTokenCookie(IAMTokenResponse));
+                context.getResponse().addCookie(createRefreshTokenCookie(IAMTokenResponse));
                 context.getResponse().addCookie(createClientReadableLoggedInCookie());
-                accessToken.clearSensitiveFields();
+                IAMTokenResponse.clearSensitiveFields();
                 context.setResponseBody(null);
             } else {
-                throw new IllegalArgumentException("The access token provided by IAM was invalid");
+                throw new IllegalArgumentException("The token response was invalid because it was missing either the access token or the refresh token or both");
             }
         } catch (IOException e) {
-            log.error("Cannot deserialize token response", e);
+            log.error("Could not deserialize token response", e);
         }
 
         return null;
     }
 
-    private Cookie createRefreshTokenCookie(AccessToken accessToken) throws IOException {
-        Cookie refreshTokenCookie = new Cookie(PARAM_REFRESH_TOKEN, accessToken.getRefreshToken());
+    private Cookie createRefreshTokenCookie(IAMTokenResponse IAMTokenResponse) throws IOException {
+        Cookie refreshTokenCookie = new Cookie(PARAM_REFRESH_TOKEN, IAMTokenResponse.getRefreshToken());
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setMaxAge(getExpirationSecondsFromToken(accessToken.getRefreshToken()));
+        refreshTokenCookie.setMaxAge(getExpirationSecondsFromToken(IAMTokenResponse.getRefreshToken()));
         return refreshTokenCookie;
     }
 
-    private Cookie createAccessTokenCookie(AccessToken accessToken) throws IOException {
-        Cookie accessTokenCookie = new Cookie(PARAM_ACCESS_TOKEN, accessToken.getAccessToken());
+    private Cookie createAccessTokenCookie(IAMTokenResponse IAMTokenResponse) throws IOException {
+        Cookie accessTokenCookie = new Cookie(PARAM_ACCESS_TOKEN, IAMTokenResponse.getAccessToken());
         accessTokenCookie.setPath("/");
         accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setMaxAge(getExpirationSecondsFromToken(accessToken.getAccessToken()));
+        accessTokenCookie.setMaxAge(getExpirationSecondsFromToken(IAMTokenResponse.getAccessToken()));
         return accessTokenCookie;
     }
 
@@ -106,12 +106,19 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
         return accessTokenCookie;
     }
 
-    private int getExpirationSecondsFromToken(String accessToken) throws IOException {
+    private int getExpirationSecondsFromToken(String token)  {
         double currentEpochSeconds = Math.ceil(System.currentTimeMillis() / 1000);
-        String[] refreshTokenParts = accessToken.split("\\.");
-        String refreshTokenPayloadRaw = new String(Base64.getDecoder().decode(refreshTokenParts[1]));
-        RefreshTokenPayload refreshTokenPayload = mapper.readValue(refreshTokenPayloadRaw, RefreshTokenPayload.class);
-        int expiryEpochSeconds = refreshTokenPayload.getExpiryEpochSeconds();
+        String[] tokenParts = token.split("\\.");
+        String tokenPayLoadRaw = new String(Base64.getDecoder().decode(tokenParts[1]));
+        TokenPayload tokenPayload = null;
+
+        try {
+            tokenPayload = mapper.readValue(tokenPayLoadRaw, TokenPayload.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not deserialize a token inside the IAM token response");
+        }
+
+        int expiryEpochSeconds = tokenPayload.getExpiryEpochSeconds();
         // The expiration time is in epoch seconds format, so we must subtract the current epoch seconds to get
         // the number of seconds UNTIL expiration, which is needed by the Cookie interface.
         int i = (int) (expiryEpochSeconds - currentEpochSeconds);
@@ -123,7 +130,7 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
     @Getter
     @Setter
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private static class AccessToken {
+    private static class IAMTokenResponse {
 
         @JsonProperty("access_token")
         private String accessToken;
@@ -171,7 +178,7 @@ public class LoggedInTokensToCookiePostFilter extends ZuulFilter {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @Getter
     @Setter
-    private static class RefreshTokenPayload {
+    private static class TokenPayload {
         @JsonProperty("exp")
         private int expiryEpochSeconds;
     }

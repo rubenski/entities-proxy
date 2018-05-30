@@ -1,0 +1,38 @@
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsidGVzdGp3dHJlc291cmNlaWQiXSwidXNlcl9uYW1lIjoicnViZW5za2lAZ21haWwuY29tIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl0sImV4cCI6MTUyNzUzNTc3MCwiYXV0aG9yaXRpZXMiOlsiQ09NUEFOWV9VU0VSIl0sImp0aSI6IjQ1Yjg2MDE3LWE0ZjktNDYwZi1hYTQwLTFiMGRkZGQ4MzlhOCIsImNsaWVudF9pZCI6InRlc3Rqd3RjbGllbnRpZCJ9.bybMZNNb06bk8K4dxkmsbg-0jW5AeAz1abLn8qQ7nuU",
+  "token_type": "bearer",
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsidGVzdGp3dHJlc291cmNlaWQiXSwidXNlcl9uYW1lIjoicnViZW5za2lAZ21haWwuY29tIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl0sImF0aSI6IjQ1Yjg2MDE3LWE0ZjktNDYwZi1hYTQwLTFiMGRkZGQ4MzlhOCIsImV4cCI6MTU1OTA3MTE3MCwiYXV0aG9yaXRpZXMiOlsiQ09NUEFOWV9VU0VSIl0sImp0aSI6Ijk3Mjc0YmExLTc5NGItNDQ4YS05Y2Q0LTkxNmY0Mjg4ZmRlNCIsImNsaWVudF9pZCI6InRlc3Rqd3RjbGllbnRpZCJ9.QqNLQdM2SvkgPpUkjZ81glnWi5tBP1v1c6OKcmey-64",
+  "expires_in": 599,
+  "scope": "read write",
+  "account": {
+    "grantedAuthorities": [
+      {
+        "authority": "COMPANY_USER"
+      }
+    ],
+    "id": 3,
+    "firstName": "Piet",
+    "lastName": "Kippen",
+    "email": "rubenski@gmail.com",
+    "phone": "0653992519",
+    "password": "a4669583e9a87592725d7f35cc63813c15ea7e2f7e0e63ba4cfd01c29a228c293317878b74f5aa2a1194e0afdc63edef61e137b766afb70d7e84bc9d878af0ad",
+    "confirmPassword": "a4669583e9a87592725d7f35cc63813c15ea7e2f7e0e63ba4cfd01c29a228c293317878b74f5aa2a1194e0afdc63edef61e137b766afb70d7e84bc9d878af0ad",
+    "expired": false,
+    "enabled": true,
+    "locked": false,
+    "grants": {
+      "grants": [
+        "COMPANY_USER"
+      ]
+    },
+    "username": "rubenski@gmail.com",
+    "authorities": [
+      {
+        "authority": "COMPANY_USER"
+      }
+    ],
+    "accountNonExpired": true,
+    "accountNonLocked": true,
+    "credentialsNonExpired": true
+  }
+}
